@@ -12,7 +12,7 @@ function Basic() {
       }}).then(res => res.data)
 
     //const { data, error } = useSWR('http://www.randomnumberapi.com/api/v1.0/random?min=100&max=1000&count=5', fetcher)
-    const { data, error } = useSWR('https://us-central1-test-next-ssr-fetch.cloudfunctions.net/numbers', fetcher)
+    const { data, error } = useSWR(NEXT_PUBLIC_NUMBERS_API_URI, fetcher)
     
     if (error) return <div>failed to load</div>
     if (!data) return <div>loading...</div>
