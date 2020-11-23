@@ -5,17 +5,36 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const cors = require('cors')({origin: true});
 
-admin.initializeApp();
+admin.initializeApp({
+    credential: admin.credential.applicationDefault()
+  });
+
+  // initialise db
+var db = admin.firestore();
 
 exports.numbers = functions.https.onRequest(async (req, res) => {
+    // handle cors
     cors(req, res, () => {
-        const numbers = [
-            {period: 1, value: 104}, 
-            {period: 2, value: 198}, 
-            {period: 3, value: 127}, 
-            {period: 4, value: 159}, 
-            {period: 5, value: 203}
-        ];
-    res.json({result: numbers});
+        i = 1;
+        numbers = [];
+        
+        // get all 'numbers' documents from firestore
+        db.collection('numbers').get()
+            .then((snapshot) => {
+            snapshot.forEach((doc) => { 
+                console.log(doc.id, '=>', doc.data().value);
+                numbers_list = doc.data().value;
+                numbers_list.forEach((single_value) => {
+                    numbers.push({period: i, value: single_value});
+                    i++;
+                });
+            });
+            // send the result only after db query has returned
+            }).then(() => {
+                res.json({result: numbers});
+            })
+            .catch((err) => {
+            console.log('Error getting documents', err);
+            });
     })
 });
